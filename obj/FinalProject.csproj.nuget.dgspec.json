@@ -49,10 +49,6 @@
               "target": "Package",
               "version": "[1.0.0, )"
             },
-            "Azure.Identity": {
-              "target": "Package",
-              "version": "[1.8.2, )"
-            },
             "MySql.Data": {
               "target": "Package",
               "version": "[8.0.33, )"

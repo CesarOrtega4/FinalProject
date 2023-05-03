@@ -1,116 +1,81 @@
-using System.Data;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Azure;
 using Azure.Communication.Email;
-using Azure.Communication.Email.Models;
+
 namespace FinalProject;
-class BusinessLogic
+internal class BusinessLogic
 {
-   
     static async Task Main(string[] args)
     {
-        bool _continue = true;
-        User user;
-        GuiTier appGUI = new GuiTier();
-        DataTier database = new DataTier();
+        // this serviceConnectionString is stored in the code diectly in this example for demo purpose
+        // it should be stored in the server when working for a business application.
+        // ref: https://learn.microsoft.com/en-us/azure/communication-services/quickstarts/create-communication-resource?tabs=windows&pivots=platform-azp#store-your-connection-string
+      var sender = "DoNotReply@ad98f970-ac91-4594-85b8-751a05feeed0.azurecomm.net";
+      string serviceConnectionString =  "endpoint=https://cesarowekk10coimmunicationservice.communication.azure.com/;accesskey=m8BC6xF/YdMXSgO/zl4tYx1aBrlvb7vVCPVJ81Oq9kzqy41k8vvlUXFgQTDWXMnAAbJI/OEe3YtASZfwBAa9sA==";
+      EmailClient emailClient = new EmailClient(serviceConnectionString);
+      var subject = "Hello CIDM4360";
+      var htmlContent = @"
+                    <html>
+                        <body>
+                            <h1 style=color:red>Testing Email for Azure Email Service</h1>
+                            <h4>This is a HTML content</h4>
+                            <p>Happy Learning!!</p>
+                        </body>
+                    </html>";
 
-        // start GUI
-        user = appGUI.Login();
-
-       
-        if (database.LoginCheck(user)){
-
-            while(_continue){
-                int option  = appGUI.Dashboard(user);
-                switch(option)
-                {
-                    //Send email
-                    case 1:
-                        DataTable tableSendEmail = database.SendEmail();
-                        if(tableSendEmail != null)
-                            appGUI.DisplaySendEmail(tableSendEmail);
-                            string serviceConnectionString =  "endpoint=https://cesarowekk10coimmunicationservice.communication.azure.com/;accesskey=m8BC6xF/YdMXSgO/zl4tYx1aBrlvb7vVCPVJ81Oq9kzqy41k8vvlUXFgQTDWXMnAAbJI/OEe3YtASZfwBAa9sA==";
-                            EmailClient emailClient = new EmailClient(serviceConnectionString);
-                            var subject = "Package Status";
-                            var emailContent = new EmailContent(subject);
-                            emailContent.Html= @"
-                                        <html>
-                                            <body>
-                                                <h1 style=color:red>Your package is ready to be picked up</h1>
-                                                <h4>Retrieve your package within the next five days, otherwise it will be returned to the post office.</h4>
-                                            </body>
-                                        </html>";
+      Console.WriteLine("Please input recipient email address: ");
+      string? recipient = Console.ReadLine();
 
 
-                            var sender = "DoNotReply@ad98f970-ac91-4594-85b8-751a05feeed0.azurecomm.net";
+try
+         {
+         Console.WriteLine("Sending email with Async no Wait...");
+         EmailSendOperation emailSendOperation = await emailClient.SendAsync(Azure.WaitUntil.Started,  sender, recipient, subject, htmlContent);
 
-                            Console.WriteLine("Please input an email address: ");
-                            string? inputEmail = Console.ReadLine();
-                            var emailRecipients = new EmailRecipients(new List<EmailAddress> {
-                                new EmailAddress(inputEmail) { DisplayName = "Testing" },
-                            });
+         var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(2));
 
-                            var emailMessage = new EmailMessage(sender, emailContent, emailRecipients);
-
-                            try
-                            {
-                                SendEmailResult sendEmailResult = emailClient.Send(emailMessage);
-
-                                string messageId = sendEmailResult.MessageId;
-                                if (!string.IsNullOrEmpty(messageId))
-                                {
-                                    Console.WriteLine($"Email sent, MessageId = {messageId}");
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"Failed to send email.");
-                                    return;
-                                }
-
-                                // wait max 2 minutes to check the send status for mail.
-                                var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(2));
-                                do
-                                {
-                                    SendStatusResult sendStatus = emailClient.GetSendStatus(messageId);
-                                    Console.WriteLine($"Send mail status for MessageId : <{messageId}>, Status: [{sendStatus.Status}]");
-
-                                    if (sendStatus.Status != SendStatus.Queued)
-                                    {
-                                        break;
-                                    }
-                                    await Task.Delay(TimeSpan.FromSeconds(10));
-                                
-                                } while (!cancellationToken.IsCancellationRequested);
-
-                                if (cancellationToken.IsCancellationRequested)
-                                {
-                                    Console.WriteLine($"Email timed out");
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Error in sending email, {ex}");
-                            }
-                        break;
-                    //Records history
-                    case 2:
-                        DataTable tableRecords = database.ShowRecords();
-                        if(tableRecords != null)
-                            appGUI.DisplayRecords(tableRecords);
-                        break;
-                    // Log Out
-                    case 3:
-                        _continue = false;
-                        Console.WriteLine("You have logged out successfully");
-                        break;
-                    // default: wrong input
-                    default:
-                        Console.WriteLine("Invalid Input");
-                        break;
-                }
-
+         // Poll for email send status manually
+         while (!cancellationToken.IsCancellationRequested)
+         {
+            await emailSendOperation.UpdateStatusAsync();
+            if (emailSendOperation.HasCompleted)
+            {
+               break;
             }
-        }
-        else{
-            Console.WriteLine("Login Failed");
-        }        
-    }    
+            Console.WriteLine("Email send operation is still running...");
+            await Task.Delay(2000);
+         }
+
+if (emailSendOperation.HasValue)
+         {
+            EmailSendResult statusMonitor = emailSendOperation.Value;
+            string operationId = emailSendOperation.Id;
+            var emailSendStatus = statusMonitor.Status;
+
+            if (emailSendStatus == EmailSendStatus.Succeeded)
+            {
+               Console.WriteLine($"Email send operation succeeded with OperationId = {operationId}.\nEmail is out for delivery.");
+            }
+            else
+            {
+               var error = statusMonitor.Error;
+               Console.WriteLine($"Failed to send email.\n OperationId = {operationId}.\n Status = {emailSendStatus}.");
+               Console.WriteLine($"Error Code = {error.Code}, Message = {error.Message}");
+               return;
+            }
+         }
+         else if (cancellationToken.IsCancellationRequested)
+         {
+            Console.WriteLine($"We have timed out while  polling for email status");
+         }
+      }
+      catch (Exception ex)
+         {
+            Console.WriteLine($"Error in sending email, {ex}");
+         }
+   }
 }
+                        
