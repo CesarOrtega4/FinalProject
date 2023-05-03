@@ -40,3 +40,7 @@ C:\Users\Admin\FinalProject\obj\Debug\net6.0\refint\FinalProject.dll
 C:\Users\Admin\FinalProject\obj\Debug\net6.0\FinalProject.pdb
 C:\Users\Admin\FinalProject\obj\Debug\net6.0\FinalProject.genruntimeconfig.cache
 C:\Users\Admin\FinalProject\obj\Debug\net6.0\ref\FinalProject.dll
+C:\Users\Admin\FinalProject\bin\Debug\net6.0\Azure.Communication.Email.dll
+C:\Users\Admin\FinalProject\bin\Debug\net6.0\Azure.Core.dll
+C:\Users\Admin\FinalProject\bin\Debug\net6.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\Admin\FinalProject\bin\Debug\net6.0\System.Memory.Data.dll
