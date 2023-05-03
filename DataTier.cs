@@ -37,7 +37,8 @@ class DataTier{
         }
        
     }
-    public DataTable SendEmail(){
+    public DataTable SendEmail(User user)
+    {
         MySqlConnection conn = new MySqlConnection(connStr);
         try
         {  
