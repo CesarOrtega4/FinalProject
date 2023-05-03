@@ -33,13 +33,7 @@ internal class NewBaseType
                     case 1:
                         DataTable tableSendEmail = database.SendEmail(user);
                         if (tableSendEmail != null)
-                            appGUI.DisplaySendEmail(tableSendEmail);
-                        break;
-
-                        // this serviceConnectionString is stored in the code diectly in this example for demo purpose
-                        // it should be stored in the server when working for a business application.
-                        // ref: https://learn.microsoft.com/en-us/azure/communication-services/quickstarts/create-communication-resource?tabs=windows&pivots=platform-azp#store-your-connection-string
-                        var sender = "DoNotReply@ad98f970-ac91-4594-85b8-751a05feeed0.azurecomm.net";
+                        appGUI.DisplaySendEmail(tableSendEmail);
                         string serviceConnectionString = "endpoint=https://cesarowekk10coimmunicationservice.communication.azure.com/;accesskey=m8BC6xF/YdMXSgO/zl4tYx1aBrlvb7vVCPVJ81Oq9kzqy41k8vvlUXFgQTDWXMnAAbJI/OEe3YtASZfwBAa9sA==";
                         EmailClient emailClient = new EmailClient(serviceConnectionString);
                         var subject = "Hello CIDM4360";
@@ -52,6 +46,9 @@ internal class NewBaseType
                         </body>
                     </html>";
 
+                    var sender = "DoNotReply@ad98f970-ac91-4594-85b8-751a05feeed0.azurecomm.net";
+                
+
                         Console.WriteLine("Please input recipient email address: ");
                         string? recipient = Console.ReadLine();
 
@@ -63,6 +60,8 @@ internal class NewBaseType
                         subject,
                         htmlContent);
 
+
+
                         /// Call UpdateStatus on the email send operation to poll for the status manually.
                         try
                         {
@@ -73,26 +72,46 @@ internal class NewBaseType
                                 {
                                     break;
                                 }
-                                await Task.Delay(2000);
+                                await Task.Delay(10);
                             }
 
                             if (emailSendOperation.HasValue)
                             {
                                 Console.WriteLine($"Email queued for delivery. Status = {emailSendOperation.Value.Status}");
                             }
+                            
                         }
                         catch (RequestFailedException ex)
                         {
                             Console.WriteLine($"Email send failed with Code = {ex.ErrorCode} and Message = {ex.Message}");
+                            
                         }
 
                         /// Get the OperationId so that it can be used for tracking the message for troubleshooting
                         string operationId = emailSendOperation.Id;
                         Console.WriteLine($"Email operation id = {operationId}");
+                        break;
+
+                        //Records history
+                    case 2:
+                        DataTable tableRecords = database.ShowRecords();
+                        if(tableRecords != null)
+                            appGUI.DisplayRecords(tableRecords);
+                            break;
+
+                            // Log Out
+                    case 3:
+                        _continue = false;
+                        Console.WriteLine("You have logged out successfully");
+                        break;
+                    // default: wrong input
+                    default:
+                        Console.WriteLine("Invalid Input");
+                        break;
 
                     }
                 }
             }
         }
     }
-        
+       
