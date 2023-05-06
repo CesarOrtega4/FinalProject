@@ -28,13 +28,13 @@ class GuiTier{
      public void DisplayRecords(DataTable tableRecords){
         Console.WriteLine("---------------Record List-------------------");
         foreach(DataRow row in tableRecords.Rows){
-           Console.WriteLine($"Package ID: {row["id"]} \t Date: {row["pdate"]}");
+           Console.WriteLine($"Package ID: {row["id"]}");
         }
     }
     public void DisplaySendEmail(DataTable tableSendEmail){
         Console.WriteLine("---------------Package List-------------------");
         foreach(DataRow row in tableSendEmail.Rows){
-           Console.WriteLine($"Package ID: {row["package_id"]}, Agency: {row["agency"]}, Status: {row["pstatus"]}");
+           Console.WriteLine($"Package ID: {row["package_id"]}, Agency: {row["agency"]} ");
         }
     }
 }

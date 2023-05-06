@@ -82,4 +82,9 @@ class DataTier{
             return null!;
         } 
     }
+
+    internal bool LoginCheck()
+    {
+        throw new NotImplementedException();
+    }
 }

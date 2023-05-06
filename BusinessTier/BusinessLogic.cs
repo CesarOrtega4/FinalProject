@@ -8,7 +8,7 @@ using System.Data;
 using MySql.Data.MySqlClient;
 namespace FinalProject;
 
-internal class NewBaseType
+internal class BusinessLogic
 {
     static async Task Main(string[] args)
     {
