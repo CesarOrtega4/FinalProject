@@ -23,6 +23,7 @@ internal class BusinessLogic
 
         if (database.LoginCheck(user))
         {
+            Console.WriteLine("Login succeeded");
 
             while (_continue)
             {
@@ -36,13 +37,12 @@ internal class BusinessLogic
                         appGUI.DisplaySendEmail(tableSendEmail);
                         string serviceConnectionString = "endpoint=https://cesarowekk10coimmunicationservice.communication.azure.com/;accesskey=m8BC6xF/YdMXSgO/zl4tYx1aBrlvb7vVCPVJ81Oq9kzqy41k8vvlUXFgQTDWXMnAAbJI/OEe3YtASZfwBAa9sA==";
                         EmailClient emailClient = new EmailClient(serviceConnectionString);
-                        var subject = "Hello CIDM4360";
+                        var subject = "Package Status";
                         var htmlContent = @"
                     <html>
                         <body>
-                            <h1 style=color:red>Testing Email for Azure Email Service</h1>
-                            <h4>This is a HTML content</h4>
-                            <p>Happy Learning!!</p>
+                            <h1 style=color:red>Package is ready for pick up!</h1>
+                            <h4>Package must be picked up within the next 5 days, otherwise the package will be returned to sender.</h4>
                         </body>
                     </html>";
 
@@ -59,7 +59,6 @@ internal class BusinessLogic
                         recipient,
                         subject,
                         htmlContent);
-
 
 
                         /// Call UpdateStatus on the email send operation to poll for the status manually.
@@ -102,16 +101,22 @@ internal class BusinessLogic
                             // Log Out
                     case 3:
                         _continue = false;
-                        Console.WriteLine("You have logged out successfully");
+                        Console.WriteLine("You Have Logged Out Successfully");
                         break;
                     // default: wrong input
-                    default:
-                        Console.WriteLine("Invalid Input");
-                        break;
+                    // else
+                    // {
+                    //     Console.WriteLine("Invalid Input");
+                    // }
 
                     }
                 }
             }
+
+            else
+                    {
+                        Console.WriteLine("Login Failed, Try Again");
+                    }
         }
     }
        
