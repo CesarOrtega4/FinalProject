@@ -34,7 +34,7 @@ class GuiTier{
     public void DisplaySendEmail(DataTable tableSendEmail){
         Console.WriteLine("---------------Package List-------------------");
         foreach(DataRow row in tableSendEmail.Rows){
-           Console.WriteLine($"Package ID: {row["id"]} | Agency: {row["agency"]} | Status: {row["package_type"]}");
+           Console.WriteLine($"Package ID: {row["package_id"]} | Agency: {row["agency"]} | Status: {row["package_type"]}");
         }
     }
 }
